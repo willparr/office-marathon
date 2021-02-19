@@ -13,7 +13,7 @@ export const locationTaskName = 'office-marathon';
  * This is a wrapper around `Location.hasStartedLocationUpdatesAsync` with the task name prefilled.
  */
 export async function isTracking(): Promise<boolean> {
-  return await Location.hasStartedLocationUpdatesAsync(locationTaskName);
+  return Location.hasStartedLocationUpdatesAsync(locationTaskName);
 }
 
 /**
