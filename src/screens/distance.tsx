@@ -50,11 +50,12 @@ export const DistanceScreen: React.FC = () => {
   );
 };
 
+// possibly convert this into a geofence?
 function isLocationClose(startPoint: LocationObject, currentPoint: LocationObject) {
   const precision = 0.0001; // about 1.1m
 
   const isClose = Math.abs(startPoint.coords.latitude - currentPoint.coords.latitude) <= precision
   && Math.abs(startPoint.coords.longitude - currentPoint.coords.longitude) <= precision;
-  console.log(isClose);
+  console.debug(isClose);
   return isClose;
 }

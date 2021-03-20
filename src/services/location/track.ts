@@ -34,7 +34,7 @@ export async function startTracking() {
     activityType: Location.ActivityType.Fitness,
     showsBackgroundLocationIndicator: true,
   });
-  console.log('[tracking]', 'started background location task');
+  console.debug('[tracking]', 'started background location task');
 }
 
 /**
@@ -43,7 +43,7 @@ export async function startTracking() {
  */
 export async function stopTracking() {
   await Location.stopLocationUpdatesAsync(locationTaskName);
-  console.log('[tracking]', 'stopped background location task');
+  console.debug('[tracking]', 'stopped background location task');
 }
 
 /**
@@ -56,7 +56,7 @@ TaskManager.defineTask(locationTaskName, async (event) => {
   }
 
   const locations = (event.data as any).locations as Location.LocationObject[];
-  console.log('[tracking]', 'Received new locations', locations);
+  console.debug('[tracking]', 'Received new locations', locations);
 
   try {
     // have to add it sequentially, parses/serializes existing JSON
@@ -64,6 +64,6 @@ TaskManager.defineTask(locationTaskName, async (event) => {
       await addLocation(location);
     }
   } catch (error) {
-    console.log('[tracking]', 'Something went wrong when saving a new location...', error);
+    console.debug('[tracking]', 'Something went wrong when saving a new location...', error);
   }
 });
