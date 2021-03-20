@@ -1,6 +1,7 @@
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
 
+import { ReloadInstructions } from 'react-native/Libraries/NewAppScreen';
 import { addLocation, getLocations } from './storage';
 
 /**
@@ -44,6 +45,52 @@ export async function startTracking() {
 export async function stopTracking() {
   await Location.stopLocationUpdatesAsync(locationTaskName);
   console.debug('[tracking]', 'stopped background location task');
+}
+
+type Location = {
+  latitude: number
+  longitude: number
+}
+
+// Get the radius in meters
+// Calculate the sensitivity
+// 11.1 m = 0.0001 degrees
+
+// create circular geofence? don't know which way track is facing
+type CircleGeofence = {
+  center: Location,
+  radius: number
+}
+
+function between(num: number, min: number, max: number): boolean {
+  return num > min && num < max;
+}
+
+export function createGeoFence(location: Location, radius: number): CircleGeofence {
+  const convertedRadius = radius * (0.0001 / 11.1);
+  return {
+    center: location,
+    radius: convertedRadius,
+  };
+}
+
+export function isLocationInGeofence(location: Location.LocationObject, geofence: CircleGeofence) {
+  // is it within the lat boundaries?
+  // eslint-disable-next-line max-len
+
+  console.log(location.coords.latitude);
+  console.log(geofence.center.latitude - geofence.radius);
+  console.log(geofence.center.latitude + geofence.radius);
+  console.log(geofence.radius);
+
+  // eslint-disable-next-line max-len
+  if (between(location.coords.latitude, geofence.center.latitude - geofence.radius, geofence.center.latitude + geofence.radius)
+    // eslint-disable-next-line max-len
+    && between(location.coords.longitude, geofence.center.longitude - geofence.radius, geofence.center.longitude + geofence.radius)) {
+    console.log('true');
+    return true;
+  }
+  return false;
 }
 
 /**

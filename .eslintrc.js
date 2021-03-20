@@ -20,7 +20,8 @@ module.exports = {
         "import/prefer-default-export": "off",
         "import/extensions": "off",
         "no-use-before-define": "off",
-        "object-curly-newline": "off"
+        "object-curly-newline": "off",
+        "linebreak-style": "off"
     },
     "settings": {
         "import/resolver": {
