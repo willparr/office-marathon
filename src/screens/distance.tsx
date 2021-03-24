@@ -42,7 +42,10 @@ export const DistanceScreen: React.FC = () => {
         {insideRange && <Paragraph>Inside Boundary</Paragraph>}
         {!insideRange && <Paragraph>Outside Boundary</Paragraph>}
         {!tracking.isTracking && <Button onPress={tracking.startTracking}>Set Start Point</Button>}
-        <Button variant='primary' onPress={tracking.clearTracking}>Reset Calibration</Button>
+        <Button variant='primary' onPress={() => {
+          setInsideRange(false);
+          tracking.clearTracking();
+        }}>Reset Calibration</Button>
         <Paragraph>Lat: {startPoint?.coords?.latitude}</Paragraph>
         <Paragraph>Lng: {startPoint?.coords?.longitude}</Paragraph>
         {isCalibrated && <>

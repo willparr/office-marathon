@@ -63,7 +63,8 @@ type CircleGeofence = {
 }
 
 function between(num: number, min: number, max: number): boolean {
-  return num > min && num < max;
+  const isBetween = num > min && num < max;
+  return isBetween;
 }
 
 export function createGeoFence(location: Location, radius: number): CircleGeofence {
@@ -78,16 +79,11 @@ export function isLocationInGeofence(location: Location.LocationObject, geofence
   // is it within the lat boundaries?
   // eslint-disable-next-line max-len
 
-  console.log(location.coords.latitude);
-  console.log(geofence.center.latitude - geofence.radius);
-  console.log(geofence.center.latitude + geofence.radius);
-  console.log(geofence.radius);
-
   // eslint-disable-next-line max-len
   if (between(location.coords.latitude, geofence.center.latitude - geofence.radius, geofence.center.latitude + geofence.radius)
     // eslint-disable-next-line max-len
     && between(location.coords.longitude, geofence.center.longitude - geofence.radius, geofence.center.longitude + geofence.radius)) {
-    console.log('true');
+    console.log('User inside boundary\n\n\n\n');
     return true;
   }
   return false;
@@ -103,7 +99,6 @@ TaskManager.defineTask(locationTaskName, async (event) => {
   }
 
   const locations = (event.data as any).locations as Location.LocationObject[];
-  console.debug('[tracking]', 'Received new locations', locations);
 
   try {
     // have to add it sequentially, parses/serializes existing JSON
