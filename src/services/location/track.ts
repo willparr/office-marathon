@@ -1,8 +1,7 @@
 import * as TaskManager from 'expo-task-manager';
 import * as Location from 'expo-location';
-
-import { ReloadInstructions } from 'react-native/Libraries/NewAppScreen';
-import { addLocation, getLocations } from './storage';
+import haversine from 'haversine';
+import { addLocation } from './storage';
 
 /**
  * The unique name of the background location task.
@@ -87,6 +86,44 @@ export function isLocationInGeofence(location: Location.LocationObject, geofence
     return true;
   }
   return false;
+}
+
+// This is should be called when the user starts heading towards the finish line
+export function isHeadingSameDirection(locations: Location.LocationObject[]): boolean {
+  const tolerance = 45;
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < locations.length - 1; i++) {
+    const location = locations[i];
+    const nextLocation = locations[i + 1];
+    if (!location.coords.heading || !nextLocation.coords.heading) {
+      return false;
+    }
+    const result = Math.abs(location.coords.heading - nextLocation.coords.heading);
+    console.debug(result);
+    if (result > tolerance) {
+      console.debug('\n');
+      return false;
+    }
+  }
+  console.debug('\n');
+  return true;
+}
+
+// Need to figure out how to determine we crossed the finished line if we missed a gps point
+// If they are approaching the finish line (probably determine a threshold as well)
+// And if they are in the geofence
+// then check if the next locations are traveling away from the geofence
+// record the lap time if we missed the gps point
+
+export function isApproachingFinishLine(
+  prevLocation: Location.LocationObject,
+  location: Location.LocationObject,
+  geofence: CircleGeofence,
+) {
+  const prevDistance = haversine(prevLocation.coords, geofence.center);
+  const nextDistance = haversine(location.coords, geofence.center);
+
+  return prevDistance > nextDistance;
 }
 
 /**

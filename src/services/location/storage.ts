@@ -29,6 +29,8 @@ export async function setLocations(locations: LocationObject[]): Promise<void> {
  */
 export async function addLocation(location: LocationObject): Promise<LocationObject[]> {
   const existing = await getLocations();
+  console.debug('[storage]', 'adding new location\n');
+  console.debug('[storage]', location);
   const locations = [...existing, location];
   await setLocations(locations);
   return locations;

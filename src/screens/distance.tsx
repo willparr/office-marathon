@@ -5,13 +5,14 @@ import {
   Box, Button, Paragraph, Title,
 } from '../providers/theme';
 import { useLocationData, useLocationTracking } from '../services/location';
-import { createGeoFence, isLocationInGeofence } from '../services/location/track';
+import { createGeoFence, isApproachingFinishLine, isHeadingSameDirection, isLocationInGeofence } from '../services/location/track';
 
 export const DistanceScreen: React.FC = () => {
   const locations = useLocationData();
   const tracking = useLocationTracking();
   const [isCalibrated, setIsCalibrated] = useState<boolean>(false);
   const [insideRange, setInsideRange] = useState<boolean>(false);
+  const [directionChanged, setDirectionChanged] = useState<boolean>(false);
 
   const startPoint = locations[0];
   const endPoint = useRef<LocationObject | undefined>();
@@ -27,7 +28,19 @@ export const DistanceScreen: React.FC = () => {
     if (tracking.isTracking && isLocationInGeofence(locations[locations.length - 1], geofence)) {
       setInsideRange(true);
     }
-  }, [locations]);
+    if (tracking.isTracking && locations.length > 4) {
+      const directionChange = !isHeadingSameDirection(locations.slice(-3));
+      console.log(directionChange);
+      setDirectionChanged(directionChange);
+    }
+    if (locations.length > 2) {
+      const isApproaching = isApproachingFinishLine(
+        locations[locations.length - 2],
+        locations[locations.length - 1],
+        geofence,
+      );
+    }
+  }, [locations.length]);
 
   return (
     <Box variant='page'>
@@ -41,6 +54,8 @@ export const DistanceScreen: React.FC = () => {
       <Box variant='column'>
         {insideRange && <Paragraph>Inside Boundary</Paragraph>}
         {!insideRange && <Paragraph>Outside Boundary</Paragraph>}
+        {directionChanged && <Paragraph>Direct Changed!</Paragraph>}
+        {!directionChanged && <Paragraph>Heading same direction...</Paragraph>}
         {!tracking.isTracking && <Button onPress={tracking.startTracking}>Set Start Point</Button>}
         <Button variant='primary' onPress={() => {
           setInsideRange(false);
