@@ -33,7 +33,6 @@ const components: Theme = {
       justifyContent: 'center',
       paddingTop: Constants.statusBarHeight,
       backgroundColor: 'background',
-      padding: 4,
     },
     box: {
       paddingY: 1,
@@ -74,7 +73,7 @@ const components: Theme = {
       backgroundColor: 'black',
       borderRadius: 2,
       paddingX: 3,
-      paddingY: 2
+      paddingY: 2,
     },
   },
 };

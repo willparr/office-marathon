@@ -1,3 +1,4 @@
+import { NavigationHelpersContext, useNavigation } from '@react-navigation/core';
 import { LocationObject } from 'expo-location';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -8,6 +9,7 @@ import { useLocationData, useLocationTracking } from '../services/location';
 import { createGeoFence, isApproachingFinishLine, isHeadingSameDirection, isLocationInGeofence } from '../services/location/track';
 
 export const DistanceScreen: React.FC = () => {
+  const navigation = useNavigation();
   const locations = useLocationData();
   const tracking = useLocationTracking();
   const [isCalibrated, setIsCalibrated] = useState<boolean>(false);
@@ -43,7 +45,7 @@ export const DistanceScreen: React.FC = () => {
   }, [locations.length]);
 
   return (
-    <Box variant='page'>
+  <Box variant='page'>
       <Box>
         <Title>Track Setup</Title>
         {tracking.isTracking
@@ -61,6 +63,12 @@ export const DistanceScreen: React.FC = () => {
           setInsideRange(false);
           tracking.clearTracking();
         }}>Reset Calibration</Button>
+        <Button variant='primary' onPress={async () => {
+          if (tracking.isTracking) {
+            await tracking.stopTracking();
+          }
+          navigation.navigate('MapReview', { locations });
+        }}>Review Tracking</Button>
         <Paragraph>Lat: {startPoint?.coords?.latitude}</Paragraph>
         <Paragraph>Lng: {startPoint?.coords?.longitude}</Paragraph>
         {isCalibrated && <>
@@ -71,6 +79,6 @@ export const DistanceScreen: React.FC = () => {
         }
 
       </Box>
-    </Box>
+  </Box>
   );
 };
