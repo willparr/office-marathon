@@ -88,6 +88,13 @@ export function isLocationInGeofence(location: Location.LocationObject, geofence
   return false;
 }
 
+export function didUserCrossFinishLine(locations: Location.LocationObject[]) {
+  // Is the user heading the same direction this entire way?
+  isHeadingSameDirection(locations);
+
+  // Is the user approaching the finish line in this location array?
+}
+
 // This is should be called when the user starts heading towards the finish line
 export function isHeadingSameDirection(locations: Location.LocationObject[]): boolean {
   const tolerance = 45;
@@ -109,6 +116,44 @@ export function isHeadingSameDirection(locations: Location.LocationObject[]): bo
   return true;
 }
 
+// Calculate the destination point given distance and bearing from the start point
+// 20 meters is the tolerance
+export function predictUserDirection(location: Location.LocationObject): Location | undefined {
+  if (!location.coords.heading) {
+    return undefined;
+  }
+  const tolerance = 20;
+  const earthRadius = 6371000;
+
+  // const lat2 = Math.asin( Math.sin(lat1)*Math.cos(d/R) +
+  //                     Math.cos(lat1)*Math.sin(d/R)*Math.cos(brng) );
+  const latRadians = toRadians(location.coords.latitude);
+  const lngRadians = toRadians(location.coords.longitude);
+  const headingRadians = toRadians(location.coords.heading);
+
+  const predictLat = Math.asin(Math.sin(latRadians)
+  * Math.cos(tolerance / earthRadius)
+  + Math.cos(latRadians)
+  * Math.sin(tolerance / earthRadius) * Math.cos(headingRadians));
+
+  const predictLng = lngRadians
+  + Math.atan2(Math.sin(headingRadians)
+  * Math.sin(tolerance / earthRadius)
+  * Math.cos(latRadians),
+  Math.cos(tolerance / earthRadius)
+  - Math.sin(latRadians) * Math.sin(predictLat));
+
+  return { latitude: toDegrees(predictLat), longitude: toDegrees(predictLng) };
+}
+
+function toRadians(degrees: number): number {
+  return degrees * (3.14 / 180);
+}
+
+function toDegrees(radians: number): number {
+  return radians * (180 / 3.14);
+}
+
 // Need to figure out how to determine we crossed the finished line if we missed a gps point
 // If they are approaching the finish line (probably determine a threshold as well)
 // And if they are in the geofence
@@ -120,10 +165,12 @@ export function isApproachingFinishLine(
   location: Location.LocationObject,
   geofence: CircleGeofence,
 ) {
-  const prevDistance = haversine(prevLocation.coords, geofence.center);
-  const nextDistance = haversine(location.coords, geofence.center);
+  const prevDistance = haversine(prevLocation.coords, geofence.center, { unit: 'meter' });
+  const nextDistance = haversine(location.coords, geofence.center, { unit: 'meter' });
 
-  return prevDistance > nextDistance;
+  console.log('[nextDistance]: ', nextDistance);
+
+  return prevDistance > nextDistance && nextDistance < 100;
 }
 
 /**

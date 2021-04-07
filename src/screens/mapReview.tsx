@@ -4,6 +4,7 @@ import { Dimensions } from 'react-native';
 import { LocationObject } from 'expo-location';
 import haversine from 'haversine';
 import { Paragraph, Button, Box } from '../providers/theme';
+import { min } from 'react-native-reanimated';
 
 interface MapReviewProps {
     locations: LocationObject[]
@@ -57,29 +58,16 @@ export const MapReviewScreen = ({ route, navigation } : MapReviewProps): React.R
 };
 
 function getMaxSpeed(locations: LocationObject[]): number {
-  let maxSpeed = Number.MIN_SAFE_INTEGER;
   // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < locations.length; i++) {
-    const { speed } = locations[i].coords;
-    if (speed) {
-      if (speed > maxSpeed) {
-        maxSpeed = locations[i].coords.speed as number;
-      }
-    }
-  }
+  const maxSpeed = locations
+    .map((location) => location.coords.speed ?? Number.MIN_SAFE_INTEGER)
+    .reduce((a, b) => Math.max(a, b));
   return maxSpeed;
 }
 
 function getMinSpeed(locations: LocationObject[]): number {
-  let minSpeed = Number.MAX_SAFE_INTEGER;
-  // eslint-disable-next-line no-plusplus
-  for (let i = 0; i < locations.length; i++) {
-    const { speed } = locations[i].coords;
-    if (speed) {
-      if (speed < minSpeed) {
-        minSpeed = locations[i].coords.speed as number;
-      }
-    }
-  }
+  const minSpeed = locations
+    .map((location) => location.coords.speed ?? Number.MIN_SAFE_INTEGER)
+    .reduce((a, b) => Math.min(a, b));
   return minSpeed;
 }

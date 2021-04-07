@@ -14,7 +14,7 @@ export const DistanceScreen: React.FC = () => {
   const tracking = useLocationTracking();
   const [isCalibrated, setIsCalibrated] = useState<boolean>(false);
   const [insideRange, setInsideRange] = useState<boolean>(false);
-  const [directionChanged, setDirectionChanged] = useState<boolean>(false);
+  const [approachingFinishLine, setApproachingFinishLine] = useState<boolean>(false);
 
   const startPoint = locations[0];
   const endPoint = useRef<LocationObject | undefined>();
@@ -30,17 +30,13 @@ export const DistanceScreen: React.FC = () => {
     if (tracking.isTracking && isLocationInGeofence(locations[locations.length - 1], geofence)) {
       setInsideRange(true);
     }
-    if (tracking.isTracking && locations.length > 4) {
-      const directionChange = !isHeadingSameDirection(locations.slice(-3));
-      console.log(directionChange);
-      setDirectionChanged(directionChange);
-    }
     if (locations.length > 2) {
       const isApproaching = isApproachingFinishLine(
         locations[locations.length - 2],
         locations[locations.length - 1],
         geofence,
       );
+      setApproachingFinishLine(isApproaching);
     }
   }, [locations.length]);
 
@@ -56,8 +52,7 @@ export const DistanceScreen: React.FC = () => {
       <Box variant='column'>
         {insideRange && <Paragraph>Inside Boundary</Paragraph>}
         {!insideRange && <Paragraph>Outside Boundary</Paragraph>}
-        {directionChanged && <Paragraph>Direct Changed!</Paragraph>}
-        {!directionChanged && <Paragraph>Heading same direction...</Paragraph>}
+        {approachingFinishLine && <Paragraph>Approaching Finish Line!</Paragraph>}
         {!tracking.isTracking && <Button onPress={tracking.startTracking}>Set Start Point</Button>}
         <Button variant='primary' onPress={() => {
           setInsideRange(false);
@@ -69,6 +64,9 @@ export const DistanceScreen: React.FC = () => {
           }
           navigation.navigate('MapReview', { locations });
         }}>Review Tracking</Button>
+        <Button variant='primary' onPress={async () => {
+          navigation.navigate('LiveTracking');
+        }}>Live Tracking</Button>
         <Paragraph>Lat: {startPoint?.coords?.latitude}</Paragraph>
         <Paragraph>Lng: {startPoint?.coords?.longitude}</Paragraph>
         {isCalibrated && <>

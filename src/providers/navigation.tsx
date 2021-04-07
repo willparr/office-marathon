@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
 
 import { DistanceScreen } from '../screens/distance';
+import { LiveTrackingScreen } from '../screens/liveTracking';
 import { MapReviewScreen } from '../screens/mapReview';
 import { OnboardingScreen } from '../screens/onboarding';
 
@@ -14,6 +15,7 @@ export const NavigationProvider: React.FC = () => (
       <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       <Stack.Screen name="Distance" component={DistanceScreen} />
       <Stack.Screen name="MapReview" component={MapReviewScreen} />
+      <Stack.Screen name="LiveTracking" component={LiveTrackingScreen} />
     </Stack.Navigator>
   </NavigationContainer>
 );
